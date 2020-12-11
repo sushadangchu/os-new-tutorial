@@ -1,4 +1,37 @@
 # Chapter1 裸机应用（优先级1）
+## 完成情况
+- 可以实现裸机运行要求的2个app
+- 使用ld文件对内核进行布局，具体的串口输出使用了opensbi来操作，内核直接调用opensbi提供的接口
+- 2个系统调用基本为摆设，目前没有作用，因为内核和用户态还没有区分开，目前整个过程都是运行在s态的
+```
+OpenSBI v0.6
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name          : QEMU Virt Machine
+Platform HART Features : RV64ACDFIMSU
+Platform Max HARTs     : 8
+Current Hart           : 0
+Firmware Base          : 0x80000000
+Firmware Size          : 120 KB
+Runtime SBI Version    : 0.2
+
+MIDELEG : 0x0000000000000222
+MEDELEG : 0x000000000000b109
+PMP0    : 0x0000000080000000-0x000000008001ffff (A)
+PMP1    : 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
+hello world!
+exit (:
+sum = 15
+exit (:
+panic: 'end of rustmain'
+```
 ## 主要动机
 支持应用进行计算与结果输出。
 
