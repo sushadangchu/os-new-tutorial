@@ -12,17 +12,21 @@
 mod console;
 mod panic;
 mod sbi;
+mod interrupt;
+mod process;
 mod syscall;
-mod user_app;
+mod user;
+
+use interrupt::*;
+use process::*;
 
 global_asm!(include_str!("entry.asm"));
 
-use crate::user_app::*;
-
 #[no_mangle]
 pub extern "C" fn rust_main() -> !{
-    hello_world();
-    let a = [1, 2, 3, 4, 5];
-    count_sum(a);
+    interrupt::init();
+
+    process::next_app(0);
+
     panic!("end of rustmain")
 }
