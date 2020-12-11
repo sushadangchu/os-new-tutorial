@@ -4,6 +4,36 @@
 - 目前支持的用户程序为hello_world和count_sum，运行时数据放在用户栈，无法接触到内核。加载顺序是固定的，执行完最后一个程序系统结束。
 - 目前主要的缺陷是用户程序和内核都放在一起，且编译完成的用户程序地址还在内核中，没有做到真正的分离。且应用数量是写死的，如果增加的话需要更改内核代码。因为第二章只要求实现2个用户程序，所以现在的代码基本满足要求。
 - 打算真正的分离放到后面的章节来做，比如调度或者实现真实的进程的时候。
+```
+OpenSBI v0.6
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name          : QEMU Virt Machine
+Platform HART Features : RV64ACDFIMSU
+Platform Max HARTs     : 8
+Current Hart           : 0
+Firmware Base          : 0x80000000
+Firmware Size          : 120 KB
+Runtime SBI Version    : 0.2
+
+MIDELEG : 0x0000000000000222
+MEDELEG : 0x000000000000b109
+PMP0    : 0x0000000080000000-0x000000008001ffff (A)
+PMP1    : 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
+[S] mod interrupt init
+hello_world
+[S] exit (:
+sum = 15
+[S] exit (:
+panic: '[S] all app end'
+```
 
 ## 主要动机
 内核不会被应用程序破坏
