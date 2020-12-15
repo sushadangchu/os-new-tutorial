@@ -5,12 +5,14 @@ use crate::interrupt::*;
 use crate::user::*;
 use crate::syscall::SYS_EXIT;
 
+const APP_NUM: usize = 4;
+
 pub struct Scheduler {
     pub inner: RefCell<SchedulerInner>,
 }
 
 pub struct SchedulerInner {
-    pub processes: [Process; 3],
+    pub processes: [Process; APP_NUM],
     pub current_process: usize,
     pub app_num: usize,
 }
@@ -19,11 +21,11 @@ unsafe impl Sync for Scheduler {}
 
 lazy_static! {
     pub static ref SCHEDULER: Scheduler = {
-        let app_addr = [write_a as usize, write_b as usize, write_c as usize];
+        let app_addr = [power_3 as usize, power_5 as usize, power_7 as usize, sleep as usize];
         
         let mut processes = [
-            Process { context_ptr: 0, state: processStatus::Ready };
-            3
+            Process { context_ptr: 0, state: ProcessStatus::Ready };
+            APP_NUM
         ];
 
 
@@ -55,8 +57,8 @@ impl Scheduler {
         let mut next_run = 0;
         let mut flag = false;
         for i in 1..=inner.processes.len() {
-            let j = (i + current_process) % 3;
-            if inner.processes[j].state == processStatus::Ready {
+            let j = (i + current_process) % APP_NUM;
+            if inner.processes[j].state == ProcessStatus::Ready {
                 next_run = j;
                 flag = true;
                 break;
@@ -65,9 +67,9 @@ impl Scheduler {
 
         if sys_id == SYS_EXIT {
             inner.app_num -= 1;
-            inner.processes[current_process].state = processStatus::Exited;
+            inner.processes[current_process].state = ProcessStatus::Exited;
         } else {
-            inner.processes[current_process].state = processStatus::Ready;
+            inner.processes[current_process].state = ProcessStatus::Ready;
         }
 
         if flag == false {
@@ -77,13 +79,12 @@ impl Scheduler {
         }
 
 
-        if inner.processes[current_process].state == processStatus::Running {
-            inner.processes[current_process].state = processStatus::Ready;
+        if inner.processes[current_process].state == ProcessStatus::Running {
+            inner.processes[current_process].state = ProcessStatus::Ready;
         }
         
-        flag = false;
         inner.current_process = next_run;
-        inner.processes[next_run].state = processStatus::Running;
+        inner.processes[next_run].state = ProcessStatus::Running;
         inner.processes[next_run].context_ptr
     }
 }

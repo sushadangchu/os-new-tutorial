@@ -1,4 +1,3 @@
-use super::*;
 use crate::dispatch::*;
 
 pub fn next_app(sys_id: usize) -> !{

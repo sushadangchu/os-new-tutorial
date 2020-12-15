@@ -6,9 +6,9 @@ pub struct UserStack{
     stack: [u8; USER_STACK_SIZE],
 }
 
-pub static mut USER_STACK: [UserStack; 3] = [
+pub static mut USER_STACK: [UserStack; SATACK_NUM] = [
     UserStack{ stack: [0; USER_STACK_SIZE] };
-    3
+    SATACK_NUM
 ];
 
 impl UserStack {

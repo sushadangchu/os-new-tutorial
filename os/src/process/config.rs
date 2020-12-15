@@ -1,5 +1,7 @@
 /// 线程栈大小 8 KB
 pub const USER_STACK_SIZE: usize = 0x1_000;
 
-/// 内核栈大小  KB
+/// 内核栈大小 8 KB
 pub const KERNEL_STACK_SIZE: usize = 0x1_000;
+
+pub const SATACK_NUM: usize = 4;

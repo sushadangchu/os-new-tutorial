@@ -1,13 +1,11 @@
-use crate::interrupt::Context;
-
 #[derive(Copy, Clone)]
 pub struct Process {
     pub context_ptr: usize,
-    pub state: processStatus,
+    pub state: ProcessStatus,
 }
 
 #[derive(Copy, Clone, PartialEq)]
-pub enum processStatus {
+pub enum ProcessStatus {
     Running,
     Waiting,
     Ready,
