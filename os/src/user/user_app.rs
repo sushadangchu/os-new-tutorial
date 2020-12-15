@@ -1,20 +1,20 @@
 use super::*;
 
-pub fn hello_world() {
-    printlnu!("hello_world");
-    sys_exit(0);
-}
+// pub fn hello_world() {
+//     printlnu!("hello_world");
+//     sys_exit(0);
+// }
 
-pub fn count_sum() {
-    let array = [1, 2, 3, 4, 5];
-    let mut sum = 0;
-    for i in array.iter() {
-        sum += i;
-    }
-    printlnu!("count_sum");
-    printlnu!("sum = {}", sum);
-    sys_exit(0);
-}
+// pub fn count_sum() {
+//     let array = [1, 2, 3, 4, 5];
+//     let mut sum = 0;
+//     for i in array.iter() {
+//         sum += i;
+//     }
+//     printlnu!("count_sum");
+//     printlnu!("sum = {}", sum);
+//     sys_exit(0);
+// }
 
 pub fn power_3() {
     const LEN: usize = 100;

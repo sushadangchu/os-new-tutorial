@@ -18,9 +18,6 @@ mod syscall;
 mod user;
 mod dispatch;
 
-use interrupt::*;
-use process::*;
-
 global_asm!(include_str!("entry.asm"));
 
 #[no_mangle]

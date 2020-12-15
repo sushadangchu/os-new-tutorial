@@ -1,7 +1,6 @@
 use super::*;
 use crate::syscall::syscall;
 use riscv::register::{
-    sstatus::{Sstatus, self, SPP},
     scause::{Exception, Interrupt, Scause, Trap},
     stvec,
 };

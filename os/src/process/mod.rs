@@ -5,7 +5,6 @@ mod batch;
 mod process;
 
 use crate::interrupt::*;
-use crate::dispatch::*;
 
 pub use config::*;
 pub use kernel_stack::KERNEL_STACK;

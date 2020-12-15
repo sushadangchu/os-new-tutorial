@@ -7,7 +7,6 @@ pub struct Process {
 #[derive(Copy, Clone, PartialEq)]
 pub enum ProcessStatus {
     Running,
-    Waiting,
     Ready,
     Exited,
 }

@@ -24,8 +24,4 @@ impl KernelStack {
         }
         push_address
     }
-
-    pub fn get_sp(&self) -> usize {
-        self.stack.as_ptr() as usize + KERNEL_STACK_SIZE
-    }
 }
