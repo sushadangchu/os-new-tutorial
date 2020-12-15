@@ -6,7 +6,8 @@ use riscv::register::sstatus::{self, Sstatus, SPP::*};
 pub struct Context {
     pub x: [usize; 32],
     pub sstatus: Sstatus,
-    pub sepc: usize
+    pub sepc: usize,
+    pub ra: usize,
 }
 
 impl Default for Context {

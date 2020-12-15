@@ -1,20 +1,21 @@
 use super::*;
-use crate::user::*;
+use lazy_static::*;
+use core::cell::RefCell;
+use crate::dispatch::*;
 
-pub fn next_app(user_app: usize) -> !{
-    if user_app == 2 {
-        panic!("[S] all app end");
-    }
-
+pub fn next_app(sys_id: usize) -> !{
     extern "C" {
         fn __restore(context: usize);
     }
 
-    let app_addr = [hello_world as usize, count_sum as usize];
-
+    let context_ptr = SCHEDULER.get_ptr(sys_id);
+    //SCHEDULER.set_state(user_app, sys_id);
+    if SCHEDULER.get_app_num() == 0 {
+        panic!("[S] all app end ");
+    }
+    //core::mem::drop(inner);
     unsafe {
-        let context = Context::new(USER_STACK.get_sp(), app_addr[user_app] as usize, true);
-        __restore(KERNEL_STACK.push_context(context) as usize)
+        __restore(context_ptr)
     };
 
     panic!("batch end!");
