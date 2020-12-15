@@ -5,6 +5,64 @@
 - 每一个程序都分配一个用户栈和内核栈，用Scheduler来记录目前程序的状态，从而调度
 - Scheduler里的get_ptr实现了switch的调度功能
 - 目前主要缺点就是内核代码需要随着用户程序的个数来进行修改，不太灵活，后续的章节会改进
+```
+OpenSBI v0.6
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name          : QEMU Virt Machine
+Platform HART Features : RV64ACDFIMSU
+Platform Max HARTs     : 8
+Current Hart           : 0
+Firmware Base          : 0x80000000
+Firmware Size          : 120 KB
+Runtime SBI Version    : 0.2
+
+MIDELEG : 0x0000000000000222
+MEDELEG : 0x000000000000b109
+PMP0    : 0x0000000080000000-0x000000008001ffff (A)
+PMP1    : 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
+[S] mod interrupt init
+AAAAAAAAAA [1/5]
+[S] yield (:
+BBBBBBBBBB [1/5]
+[S] yield (:
+AAAAAAAAAA [2/5]
+[S] yield (:
+BBBBBBBBBB [2/5]
+[S] yield (:
+AAAAAAAAAA [3/5]
+[S] yield (:
+BBBBBBBBBB [3/5]
+[S] yield (:
+AAAAAAAAAA [4/5]
+[S] yield (:
+BBBBBBBBBB [4/5]
+[S] yield (:
+AAAAAAAAAA [5/5]
+[S] yield (:
+BBBBBBBBBB [5/5]
+[S] yield (:
+Test write_a OK!
+[S] exit (:
+Test write_b OK!
+[S] exit (:
+CCCCCCCCCC [1/3]
+[S] yield (:
+CCCCCCCCCC [2/3]
+[S] yield (:
+CCCCCCCCCC [3/3]
+[S] yield (:
+Test write_c OK!
+[S] exit (:
+panic: '[S] all app end '
+```
 ## 主要动机
 提高整个应用的CPU利用率
 
