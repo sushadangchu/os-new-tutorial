@@ -1,21 +1,21 @@
 use super::*;
 
-pub fn hello_world() {
-    printlnu!("hello_world");
-    sys_exit(0);
-}
+// pub fn hello_world() {
+//     printlnu!("hello_world");
+//     sys_exit(0);
+// }
 
-pub fn count_sum() {
-    let array = [1, 2, 3, 4, 5];
-    let mut sum = 0;
-    for i in array.iter() {
-        sum += i;
-    }
-    printlnu!("count_sum");
-    sys_yield();
-    printlnu!("sum = {}", sum);
-    sys_exit(0);
-}
+// pub fn count_sum() {
+//     let array = [1, 2, 3, 4, 5];
+//     let mut sum = 0;
+//     for i in array.iter() {
+//         sum += i;
+//     }
+//     printlnu!("count_sum");
+//     sys_yield();
+//     printlnu!("sum = {}", sum);
+//     sys_exit(0);
+// }
 
 pub fn write_a() {
     let width: usize = 10;

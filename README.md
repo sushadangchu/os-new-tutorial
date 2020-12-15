@@ -1,7 +1,7 @@
 # Chapter3 分时多任务系统之一 非抢占式调度（优先级1）
 ## 完成情况
 - 基本功能都已完成，采用yiled来放弃CPU，让下一个程序运行
-- 使用吴一凡同学的3个函数来测试，目前只是实现非抢占调度，还未保障公平性
+- 使用吴一凡同学的3个函数来测试，目前只是实现非抢占调度，保障了一部分的公平性
 - 每一个程序都分配一个用户栈和内核栈，用Scheduler来记录目前程序的状态，从而调度
 - Scheduler里的get_ptr实现了switch的调度功能
 - 目前主要缺点就是内核代码需要随着用户程序的个数来进行修改，不太灵活，后续的章节会改进
@@ -29,37 +29,37 @@ MEDELEG : 0x000000000000b109
 PMP0    : 0x0000000080000000-0x000000008001ffff (A)
 PMP1    : 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
 [S] mod interrupt init
-AAAAAAAAAA [1/5]
-[S] yield (:
 BBBBBBBBBB [1/5]
 [S] yield (:
-AAAAAAAAAA [2/5]
+CCCCCCCCCC [1/3]
+[S] yield (:
+AAAAAAAAAA [1/5]
 [S] yield (:
 BBBBBBBBBB [2/5]
 [S] yield (:
-AAAAAAAAAA [3/5]
+CCCCCCCCCC [2/3]
+[S] yield (:
+AAAAAAAAAA [2/5]
 [S] yield (:
 BBBBBBBBBB [3/5]
 [S] yield (:
-AAAAAAAAAA [4/5]
+CCCCCCCCCC [3/3]
+[S] yield (:
+AAAAAAAAAA [3/5]
 [S] yield (:
 BBBBBBBBBB [4/5]
 [S] yield (:
-AAAAAAAAAA [5/5]
+Test write_c OK!
+[S] exit (:
+AAAAAAAAAA [4/5]
 [S] yield (:
 BBBBBBBBBB [5/5]
 [S] yield (:
-Test write_a OK!
-[S] exit (:
+AAAAAAAAAA [5/5]
+[S] yield (:
 Test write_b OK!
 [S] exit (:
-CCCCCCCCCC [1/3]
-[S] yield (:
-CCCCCCCCCC [2/3]
-[S] yield (:
-CCCCCCCCCC [3/3]
-[S] yield (:
-Test write_c OK!
+Test write_a OK!
 [S] exit (:
 panic: '[S] all app end '
 ```
