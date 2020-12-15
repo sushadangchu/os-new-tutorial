@@ -12,7 +12,6 @@ pub fn count_sum() {
         sum += i;
     }
     printlnu!("count_sum");
-    sys_yield();
     printlnu!("sum = {}", sum);
     sys_exit(0);
 }
@@ -23,7 +22,7 @@ pub fn write_a() {
     for i in 0..height {
         for _ in 0..width { printu!("A"); }
         printlnu!(" [{}/{}]", i + 1, height);
-        sys_yield();
+        //sys_yield();
     }
     printlnu!("Test write_a OK!");
     sys_exit(0);
@@ -35,7 +34,7 @@ pub fn write_b() {
     for i in 0..height {
         for _ in 0..width { printu!("B"); }
         printlnu!(" [{}/{}]", i + 1, height);
-        sys_yield();
+        //sys_yield();
     }
     printlnu!("Test write_b OK!");
     sys_exit(0);
@@ -47,7 +46,7 @@ pub fn write_c() {
     for i in 0..height {
         for _ in 0..width { printu!("C"); }
         printlnu!(" [{}/{}]", i + 1, height);
-        sys_yield();
+        //sys_yield();
     }
     printlnu!("Test write_c OK!");
     sys_exit(0);

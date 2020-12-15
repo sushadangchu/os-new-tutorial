@@ -1,10 +1,11 @@
-use super::context::Context;
+use super::*;
 use crate::syscall::syscall;
 use riscv::register::{
     sstatus::{Sstatus, self, SPP},
     scause::{Exception, Interrupt, Scause, Trap},
     stvec,
 };
+use crate::process::next_app;
 
 global_asm!(include_str!("./interrupt.asm"));
 
@@ -22,9 +23,16 @@ pub fn init() {
 pub fn handle_interrupt(context: &mut Context, scause: Scause, stval: usize) -> &mut Context{
     // println!("[S] handle interrupt");
     // println!("spp: {:?}", context.sstatus.spp());
+    //panic!("Interrupted: {:?}", scause.cause());
     match scause.cause() {
         Trap::Exception(Exception::UserEnvCall) => handle_syscall(context),
+        Trap::Exception(Exception::StoreFault) |
+        Trap::Exception(Exception::StorePageFault) => {
+            println!("[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, core dumped.", stval, context.sepc);
+            next_app(0);
+        },
         Trap::Exception(Exception::Breakpoint) => break_point(context),
+        Trap::Interrupt(Interrupt::SupervisorTimer) => supervisor_timer(context),
         _ => fault(context, scause, stval),
     }
     context
@@ -41,6 +49,11 @@ fn break_point(context: &mut Context) {
     println!("Breakpoint at 0x{:x}", context.sepc);
     context.sepc += 2;
 
+}
+
+fn supervisor_timer(_context: &mut Context) {
+    timer::set_next_timeout();
+    next_app(0);
 }
 
 /// 出现未能解决的异常

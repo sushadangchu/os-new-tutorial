@@ -3,7 +3,7 @@ use core::cell::RefCell;
 use crate::process::*;
 use crate::interrupt::*;
 use crate::user::*;
-use crate::syscall:: {SYS_EXIT, SYS_YIELD };
+use crate::syscall::SYS_EXIT;
 
 pub struct Scheduler {
     pub inner: RefCell<SchedulerInner>,
@@ -44,11 +44,6 @@ lazy_static! {
 }
 
 impl Scheduler {
-    pub fn set_state(&self, user_app: usize, sys_id: usize) {
-        let mut inner = self.inner.borrow_mut();
-        let current_process = inner.current_process;
-    }
-
     pub fn get_app_num(&self) -> usize{
         self.inner.borrow().app_num
     }
@@ -59,9 +54,10 @@ impl Scheduler {
         let current_process = inner.current_process;
         let mut next_run = 0;
         let mut flag = false;
-        for i in 0..inner.processes.len() {
-            if inner.processes[i].state == processStatus::Ready {
-                next_run = i;
+        for i in 1..=inner.processes.len() {
+            let j = (i + current_process) % 3;
+            if inner.processes[j].state == processStatus::Ready {
+                next_run = j;
                 flag = true;
                 break;
             }
@@ -70,7 +66,7 @@ impl Scheduler {
         if sys_id == SYS_EXIT {
             inner.app_num -= 1;
             inner.processes[current_process].state = processStatus::Exited;
-        } else if sys_id == SYS_YIELD {
+        } else {
             inner.processes[current_process].state = processStatus::Ready;
         }
 
