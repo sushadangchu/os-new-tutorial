@@ -26,11 +26,12 @@ pub fn handle_interrupt(context: &mut Context, scause: Scause, stval: usize) -> 
     //panic!("Interrupted: {:?}", scause.cause());
     match scause.cause() {
         Trap::Exception(Exception::UserEnvCall) => handle_syscall(context),
-        Trap::Exception(Exception::StoreFault) |
-        Trap::Exception(Exception::StorePageFault) => {
-            println!("[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, core dumped.", stval, context.sepc);
-            next_app(0);
-        },
+        // Trap::Exception(Exception::StoreFault) |
+        // Trap::Exception(Exception::StorePageFault) => {
+        //     println!("[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, core dumped.", stval, context.sepc);
+        //     //next_app(0);
+        //     loop {}
+        // },
         Trap::Exception(Exception::Breakpoint) => break_point(context),
         Trap::Interrupt(Interrupt::SupervisorTimer) => supervisor_timer(context),
         _ => fault(context, scause, stval),
@@ -42,7 +43,7 @@ fn handle_syscall(context: &mut Context) {
     //指向系统调用回来的下一条指令
     context.sepc += 4;
     //存储系统调用返回值
-    context.x[10] = syscall(context.x[17], context.x[10], context.x[11], context.x[12]);
+    context.x[10] = syscall(context.x[17], context.x[10], context.x[11], context.x[12]) as usize;
 }
 
 fn break_point(context: &mut Context) {

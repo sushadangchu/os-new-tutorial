@@ -8,5 +8,5 @@ pub use timer::*;
 pub fn init() {
     handler::init();
     timer::init();
-    println!("[S] mod interrupt init");
+    println!("[K] mod interrupt init");
 }

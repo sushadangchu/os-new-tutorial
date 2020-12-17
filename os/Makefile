@@ -17,6 +17,7 @@ doc:
 
 # 编译 kernel
 kernel:
+	@cd ../user && make build
 	@cargo build
 
 # 生成 kernel 的二进制文件

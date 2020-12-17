@@ -1,6 +1,7 @@
 use crate::process::next_app;
+use super::SYSCALL_EXIT;
 
 pub fn sys_exit(arg0: usize) -> ! {
-    println!("[S] exit (:");
-    next_app(2)
+    println!("[K] exit (:");
+    next_app(SYSCALL_EXIT)
 }

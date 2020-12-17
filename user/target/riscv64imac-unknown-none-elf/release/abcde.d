@@ -1,0 +1,1 @@
+/home/ldl/os-new-tutorial/user/target/riscv64imac-unknown-none-elf/release/abcde: /home/ldl/os-new-tutorial/user/src/bin/abcde.rs /home/ldl/os-new-tutorial/user/src/config.rs /home/ldl/os-new-tutorial/user/src/console.rs /home/ldl/os-new-tutorial/user/src/lib.rs /home/ldl/os-new-tutorial/user/src/syscall.rs

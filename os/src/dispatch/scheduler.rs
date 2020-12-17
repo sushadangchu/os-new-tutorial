@@ -1,18 +1,16 @@
 use lazy_static::*;
 use core::cell::RefCell;
+use alloc::vec::Vec;
 use crate::process::*;
-use crate::interrupt::*;
-use crate::user::*;
-use crate::syscall::SYS_EXIT;
-
-const APP_NUM: usize = 4;
+use crate::loader::*;
+use crate::syscall::SYSCALL_EXIT;
 
 pub struct Scheduler {
     pub inner: RefCell<SchedulerInner>,
 }
 
 pub struct SchedulerInner {
-    pub processes: [Process; APP_NUM],
+    pub processes: Vec<Process>,
     pub current_process: usize,
     pub app_num: usize,
 }
@@ -21,25 +19,19 @@ unsafe impl Sync for Scheduler {}
 
 lazy_static! {
     pub static ref SCHEDULER: Scheduler = {
-        let app_addr = [power_3 as usize, power_5 as usize, power_7 as usize, sleep as usize];
+        let app_num = get_app_num();
         
-        let mut processes = [
-            Process { context_ptr: 0, state: ProcessStatus::Ready };
-            APP_NUM
-        ];
-
-
-        unsafe {
-            for i in 0..app_addr.len() {
-                let context = Context::new(USER_STACK[i].get_sp(), app_addr[i] as usize, true);
-                processes[i].context_ptr = KERNEL_STACK[i].push_context(context) as * const _ as usize;
-            }
+        let mut processes: Vec<Process> = Vec::new();
+        
+        for i in 0..app_num {
+            processes.push(Process::new(get_app_data(i), i));
         }
+
         Scheduler {
             inner: RefCell::new(SchedulerInner {
                 processes,
                 current_process: 0,
-                app_num: app_addr.len(),
+                app_num,
             }),
         }
     };
@@ -52,12 +44,13 @@ impl Scheduler {
 
     pub fn get_ptr(&self, sys_id: usize) -> usize{
         let mut inner = self.inner.borrow_mut();
+        let total_app_num = get_app_num();
         let app_num = inner.app_num;
         let current_process = inner.current_process;
         let mut next_run = 0;
         let mut flag = false;
         for i in 1..=inner.processes.len() {
-            let j = (i + current_process) % APP_NUM;
+            let j = (i + current_process) % total_app_num;
             if inner.processes[j].state == ProcessStatus::Ready {
                 next_run = j;
                 flag = true;
@@ -65,8 +58,9 @@ impl Scheduler {
             }
         }
 
-        if sys_id == SYS_EXIT {
+        if sys_id == SYSCALL_EXIT {
             inner.app_num -= 1;
+            println!("{}", inner.app_num);
             inner.processes[current_process].state = ProcessStatus::Exited;
         } else {
             inner.processes[current_process].state = ProcessStatus::Ready;
@@ -85,6 +79,7 @@ impl Scheduler {
         
         inner.current_process = next_run;
         inner.processes[next_run].state = ProcessStatus::Running;
+        inner.processes[next_run].memory_set.activate();
         inner.processes[next_run].context_ptr
     }
 }
