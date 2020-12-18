@@ -9,6 +9,7 @@ use xmas_elf::{
 };
 
 /// 一个进程所有关于内存空间管理的信息
+#[derive(PartialEq)]
 pub struct MemorySet {
     /// 维护页表和映射关系
     pub mapping: Mapping,

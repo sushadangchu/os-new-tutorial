@@ -2,12 +2,11 @@ use core::mem::zeroed;
 use riscv::register::sstatus::{self, Sstatus, SPP::*};
 
 #[repr(C)]
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Context {
     pub x: [usize; 32],
     pub sstatus: Sstatus,
     pub sepc: usize,
-    pub ra: usize,
 }
 
 impl Default for Context {

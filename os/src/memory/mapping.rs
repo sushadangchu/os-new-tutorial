@@ -8,7 +8,7 @@ use alloc::{collections::VecDeque, vec, vec::Vec};
 use core::cmp::min;
 use core::ptr::slice_from_raw_parts_mut;
 
-#[derive(Default)]
+#[derive(Default,PartialEq)]
 /// 某个线程的内存映射关系
 pub struct Mapping {
     /// 保存所有使用到的页表

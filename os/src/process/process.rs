@@ -1,28 +1,51 @@
 use crate::memory::*;
 use crate::process::*;
-use super::*;
 
+pub type ProcessID = isize;
+
+static mut PROCESS_COUNTER: ProcessID = 0;
+
+#[derive(PartialEq)]
 pub struct Process {
+    pub id: ProcessID,
+    pub stack: Range<VirtualAddress>,
+    pub is_user: bool,
     pub context_ptr: usize,
     pub memory_set: MemorySet,
     pub state: ProcessStatus,
 }
 
 impl Process {
-    pub fn new(elf_data: &[u8], app_id: usize) -> Self {
+    pub fn new(elf_data: &[u8]) -> Self {
         let (mut memory_set, enter_point) = MemorySet::from_elf(elf_data, true);
         let stack = Process::alloc_page_range(&mut memory_set, USER_STACK_SIZE, Flags::READABLE | Flags::WRITABLE);
         let context = Context::new(stack.end.into(), enter_point, true);
         let mut context_ptr: usize = 0;
         unsafe {
-            context_ptr = KERNEL_STACK[app_id].push_context(context) as * const _ as usize;
+            context_ptr = KERNEL_STACK[PROCESS_COUNTER as usize].push_context(context) as * const _ as usize;
         }
         Process {
+            id: unsafe {
+                PROCESS_COUNTER += 1;
+                PROCESS_COUNTER
+            },
+            stack,
+            is_user: true,
             context_ptr,
             memory_set,
             state: ProcessStatus::Ready,
         }
     }
+
+    pub fn prepare(&self) -> usize {
+        self.memory_set.activate();
+        self.context_ptr
+    }
+
+    pub fn set_state(&mut self, state: ProcessStatus) {
+        self.state = state;
+    }
+
 
     /// 分配一定数量的连续虚拟空间
     ///
