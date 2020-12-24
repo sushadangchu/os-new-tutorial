@@ -83,6 +83,13 @@ impl PhysicalAddress {
     pub fn page_offset(&self) -> usize {
         self.0 % PAGE_SIZE
     }
+
+    pub fn get_bytes_array(&self) -> &'static mut [u8] {
+        let pa: PhysicalAddress = self.clone();
+        unsafe {
+            core::slice::from_raw_parts_mut(pa.0 as *mut u8, 4096)
+        }
+    }
 }
 impl VirtualPageNumber {
     /// 从虚拟地址取得页面

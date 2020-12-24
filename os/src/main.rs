@@ -23,7 +23,6 @@ mod sbi;
 mod interrupt;
 mod process;
 mod syscall;
-mod user;
 mod dispatch;
 mod memory;
 mod loader;
@@ -44,18 +43,17 @@ pub extern "C" fn rust_main() {
     memory::init();
     interrupt::init();
 
-    let process1 = Arc::new(Process::new(get_app_data_by_name("00power_3").unwrap()));
-    let process2 = Arc::new(Process::new(get_app_data_by_name("01power_5").unwrap()));
+    let process1 = Arc::new(Process::new(get_app_data_by_name("hello_world").unwrap()));
+    //let process2 = Arc::new(Process::new(get_app_data_by_name("01power_5").unwrap()));
     //let process3 = Arc::new(Process::new(get_app_data_by_name("02power_7").unwrap()));
-    //let process4 = Arc::new(Process::new(get_app_data_by_name("03sleep").unwrap()));
+    // let process4 = Arc::new(Process::new(get_app_data_by_name("03sleep").unwrap()));
 
     SCHEDULER.lock().add_process(process1);
-    SCHEDULER.lock().add_process(process2);
+    //SCHEDULER.lock().add_process(process2);
     //SCHEDULER.lock().add_process(process3);
-    //SCHEDULER.lock().add_process(process4);
+    // SCHEDULER.lock().add_process(process4);
 
-    //第一个参数为开始运行的app，第二个参数为初始状态
     process::next_app(0);
-
+    
     panic!("end of rustmain")
 }

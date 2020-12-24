@@ -9,7 +9,7 @@ use xmas_elf::{
 };
 
 /// 一个进程所有关于内存空间管理的信息
-#[derive(PartialEq)]
+#[derive(Clone,PartialEq)]
 pub struct MemorySet {
     /// 维护页表和映射关系
     pub mapping: Mapping,
@@ -73,8 +73,7 @@ impl MemorySet {
             segments,
         })
     }
-
-    /// 替换 `satp` 以激活页表
+    
     pub fn from_elf(elf_data: &[u8], is_user: bool) -> (Self, usize) {
         // 建立带有内核映射的 MemorySet
         let mut memory_set = MemorySet::new_kernel().unwrap();
@@ -112,7 +111,7 @@ impl MemorySet {
 
         (memory_set, elf.header.pt2.entry_point() as usize)
     }
-    ///
+    /// 替换 `satp` 以激活页表
     /// 如果当前页表就是自身，则不会替换，但仍然会刷新 TLB。
     pub fn activate(&self) {
         self.mapping.activate();
@@ -152,6 +151,56 @@ impl MemorySet {
             }
         }
         false
+    }
+
+    pub fn copy_memory_set(current_memory_set: &MemorySet) -> MemorySet {
+        let mut memory_set = MemorySet::new_kernel().unwrap();
+        for segment in current_memory_set.segments.iter() {
+            if segment.map_type == MapType::Framed {
+                let new_segment = Segment {
+                    map_type: segment.map_type,
+                    range: segment.range.clone(),
+                    flags: segment.flags,
+                };
+                memory_set.add_segment(new_segment, None).unwrap();
+                let mut vpn_range = Vec::new();
+                let mut temp: usize = 0;
+                for vp in segment.range.iter() {
+                    let vpn = vp.0 / PAGE_SIZE;
+                    if vpn != temp {
+                        temp = vpn;
+                        vpn_range.push(vp);
+                    }
+                }
+
+                //println!("vpn {}", vpn_range.len());
+
+                // for vpn in segment.range.iter() {
+                //     current_memory_set.activate();
+                //     let parent_ppn = Mapping::lookup(vpn).unwrap();
+                //     memory_set.activate();
+                //     let children_ppn = Mapping::lookup(vpn).unwrap();
+                //     *children_ppn.deref_kernel::<u8>() = *parent_ppn.deref_kernel::<u8>();
+                // }
+
+                
+                
+                for vpn in vpn_range {
+                    //println!("{}", vpn);
+                    current_memory_set.activate();
+                    let parent_ppn = Mapping::lookup(vpn).unwrap();
+                    memory_set.activate();
+                    let children_ppn = Mapping::lookup(vpn).unwrap();
+                    //println!("parent_ppn {}, children_ppn {}", parent_ppn, children_ppn);
+                    //children_ppn.get_bytes_array().copy_from_slice(parent_ppn.get_bytes_array());
+                    for i in 0..PAGE_SIZE {
+                        *(children_ppn + i).deref_kernel::<u8>() = *(parent_ppn + i).deref_kernel::<u8>();
+                    }
+                }
+            }
+        }
+        current_memory_set.activate();
+        memory_set
     }
 
 }

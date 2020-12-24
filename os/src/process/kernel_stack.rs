@@ -4,7 +4,7 @@ use core::mem::size_of;
 #[repr(align(16))]
 #[derive(Copy, Clone)]
 pub struct KernelStack{
-    stack: [u8; KERNEL_STACK_SIZE],
+    pub stack: [u8; KERNEL_STACK_SIZE],
 }
 
 pub static mut KERNEL_STACK: [KernelStack; SATACK_NUM] = [

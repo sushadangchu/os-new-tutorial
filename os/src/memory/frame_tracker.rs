@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(PartialEq)]
+#[derive(Clone,PartialEq)]
 pub struct FrameTracker(pub(super) PhysicalPageNumber);
 
 impl FrameTracker {

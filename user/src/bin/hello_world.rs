@@ -4,12 +4,21 @@
 #[macro_use]
 extern crate user_lib;
 
-const LEN: usize = 100;
-
-static mut S: [u64; LEN] = [0u64; LEN];
+use user_lib::{
+    fork,
+    wait,
+    exec,
+    yield_,
+};
 
 #[no_mangle]
-unsafe fn main() -> i32 {
-    println!("Test power_3 OK!");
+pub fn main() -> i32 {
+    if fork() == 0 {
+        println!("child");
+        exec("yield");
+    } else {
+        println!("parent");
+    }
+    println!("Hello world from user mode program!");
     0
 }

@@ -1,18 +1,27 @@
 use crate::memory::*;
 use crate::process::*;
+use core::mem::size_of;
+use spin::Mutex;
+use super::*;
+use alloc::sync::Arc;
+use alloc::vec::Vec;
 
 pub type ProcessID = isize;
 
 static mut PROCESS_COUNTER: ProcessID = 0;
 
-#[derive(PartialEq)]
 pub struct Process {
     pub id: ProcessID,
-    pub stack: Range<VirtualAddress>,
     pub is_user: bool,
+    pub inner: Mutex<ProcessInner>,
+}
+
+pub struct ProcessInner {
+    pub stack: Range<VirtualAddress>,
     pub context_ptr: usize,
     pub memory_set: MemorySet,
     pub state: ProcessStatus,
+    pub child: Vec<isize>,
 }
 
 impl Process {
@@ -20,30 +29,92 @@ impl Process {
         let (mut memory_set, enter_point) = MemorySet::from_elf(elf_data, true);
         let stack = Process::alloc_page_range(&mut memory_set, USER_STACK_SIZE, Flags::READABLE | Flags::WRITABLE);
         let context = Context::new(stack.end.into(), enter_point, true);
-        let mut context_ptr: usize = 0;
-        unsafe {
-            context_ptr = KERNEL_STACK[PROCESS_COUNTER as usize].push_context(context) as * const _ as usize;
-        }
+        
         Process {
             id: unsafe {
                 PROCESS_COUNTER += 1;
                 PROCESS_COUNTER
             },
-            stack,
             is_user: true,
-            context_ptr,
-            memory_set,
-            state: ProcessStatus::Ready,
+            inner: Mutex::new(ProcessInner {
+                stack,
+                context_ptr: unsafe {
+                    KERNEL_STACK[(PROCESS_COUNTER - 1) as usize].push_context(context) as * const _ as usize
+                },
+                memory_set,
+                state: ProcessStatus::Ready,
+                child: Vec::new(),
+            }),
+        }
+    }
+
+    pub fn fork(self: &Arc<Process>) -> Arc<Process> {
+        let memory_set = MemorySet::copy_memory_set(&self.inner().memory_set);
+        let stack = self.inner().stack.clone();
+        let index = self.id - 1;
+        
+        for i in 0..KERNEL_STACK_SIZE {
+            unsafe {
+                KERNEL_STACK[PROCESS_COUNTER as usize].stack[i] = KERNEL_STACK[index as usize].stack[i];
+            }
+        }
+
+        let mut context_ptr = 0;
+
+        unsafe {
+            let stack_top = &KERNEL_STACK[PROCESS_COUNTER as usize].stack as *const _ as usize + size_of::<KernelStack>();
+            
+            context_ptr = stack_top - size_of::<Context>();
+        }
+
+        let child = self.inner().child.clone();
+
+        unsafe {
+            self.inner().child.push(PROCESS_COUNTER + 1);
+        }
+
+        Arc::new(Process {
+            id: unsafe {
+                PROCESS_COUNTER += 1;
+                PROCESS_COUNTER
+            },
+            is_user: true,
+            inner: Mutex::new(ProcessInner {
+                stack,
+                context_ptr,
+                memory_set,
+                state: ProcessStatus::Ready,
+                child,
+            }),
+        })
+    }
+
+    pub fn exec(&self, elf_data: &[u8]) {
+        let (mut memory_set, enter_point) = MemorySet::from_elf(elf_data, true);
+        let stack = Process::alloc_page_range(&mut memory_set, USER_STACK_SIZE, Flags::READABLE | Flags::WRITABLE);
+        let context = Context::new(stack.end.into(), enter_point, true);
+        self.inner().context_ptr = unsafe {
+            KERNEL_STACK[(self.id - 1) as usize].push_context(context) as * const _ as usize
+        };
+        memory_set.activate();
+        self.inner().stack = stack;
+        self.inner().memory_set = memory_set;
+        self.inner().child = Vec::new();
+    }
+
+    pub fn get_context(&self) -> *mut Context {
+        unsafe {
+            self.inner().context_ptr as *mut Context
         }
     }
 
     pub fn prepare(&self) -> usize {
-        self.memory_set.activate();
-        self.context_ptr
+        self.inner().memory_set.activate();
+        self.inner().context_ptr
     }
 
     pub fn set_state(&mut self, state: ProcessStatus) {
-        self.state = state;
+        self.inner().state = state;
     }
 
 
@@ -77,7 +148,23 @@ impl Process {
         // 返回地址区间（使用参数 size，而非向上取整的 alloc_size）
         Range::from(range.start..(range.start + size))
     }
+
+    pub fn get_pid(&self) -> isize {
+        self.id
+    }
+
+    pub fn inner(&self) -> spin::MutexGuard<ProcessInner> {
+        self.inner.lock()
+    }
 }
+
+impl PartialEq for Process {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for Process {}
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum ProcessStatus {

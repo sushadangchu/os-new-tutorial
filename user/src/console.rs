@@ -37,3 +37,9 @@ macro_rules! println {
         $crate::console::print(format_args!(concat!($fmt, "\n") $(, $($arg)+)?));
     }
 }
+
+pub fn getchar() -> u8 {
+    let mut c = [0u8; 1];
+    sys_read(STDIN, &mut c);
+    c[0]
+}
