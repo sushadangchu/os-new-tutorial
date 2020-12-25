@@ -67,8 +67,6 @@ impl Process {
             context_ptr = stack_top - size_of::<Context>();
         }
 
-        let child = self.inner().child.clone();
-
         unsafe {
             self.inner().child.push(PROCESS_COUNTER + 1);
         }
@@ -84,7 +82,7 @@ impl Process {
                 context_ptr,
                 memory_set,
                 state: ProcessStatus::Ready,
-                child,
+                child: Vec::new(),
             }),
         })
     }

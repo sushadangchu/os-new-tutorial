@@ -8,6 +8,10 @@ edition = "2018"
 
 [dependencies]
 riscv = { git = "https://github.com/rcore-os/riscv", features = ["inline-asm"] }
+device_tree = { git = "https://github.com/rcore-os/device_tree-rs" }
+virtio-drivers = { git = "https://github.com/rcore-os/virtio-drivers" }
+rcore-fs = { git = "https://github.com/rcore-os/rcore-fs"}
+rcore-fs-sfs = { git = "https://github.com/rcore-os/rcore-fs"}
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 buddy_system_allocator = "0.3.9"
 spin = "0.5.2"
