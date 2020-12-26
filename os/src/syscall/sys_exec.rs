@@ -1,9 +1,5 @@
-use crate::process::*;
-use super::*;
 use crate::fs::*;
-use crate::loader::get_app_data_by_name;
 use crate::dispatch::*;
-use alloc::sync::Arc;
 
 pub fn sys_exec(buf: *const u8, len: usize) -> isize{
     let slice = unsafe { core::slice::from_raw_parts(buf, len) };

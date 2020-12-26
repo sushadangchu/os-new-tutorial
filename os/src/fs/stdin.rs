@@ -54,9 +54,9 @@ impl INode for Stdin {
 }
 
 impl Stdin {
-    /// 向缓冲区插入一个字符，然后唤起一个线程
-    pub fn push(&self, c: u8) {
-        self.buffer.lock().push_back(c);
-        //self.condvar.notify_one();
-    }
+    // 向缓冲区插入一个字符，然后唤起一个线程
+    // pub fn push(&self, c: u8) {
+    //     self.buffer.lock().push_back(c);
+    //     //self.condvar.notify_one();
+    // }
 }

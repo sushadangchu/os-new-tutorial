@@ -1,10 +1,7 @@
 use lazy_static::*;
-use core::cell::RefCell;
 use alloc::sync::Arc;
 use spin::Mutex;
-use alloc::vec::Vec;
 use crate::process::*;
-use crate::loader::*;
 use alloc::collections::LinkedList;
 use crate::syscall::SYSCALL_EXIT;
 
@@ -43,17 +40,13 @@ impl Scheduler {
         }
     }
 
-    pub fn remove_process(&mut self, process: &Arc<Process>) {
-        let mut removed = self.processes.drain_filter(|p| p == process);
-        assert!(removed.next().is_some() && removed.next().is_none());
-    }
+    // pub fn remove_process(&mut self, process: &Arc<Process>) {
+    //     let mut removed = self.processes.drain_filter(|p| p == process);
+    //     assert!(removed.next().is_some() && removed.next().is_none());
+    // }
 
     pub fn current_process(&self) -> Option<Arc<Process>> {
         self.current_process.as_ref().map(|process| process.clone())
-    }
-
-    pub fn current_process_id(&self) {
-        println!("{:?}", self.process_ids);
     }
 
     pub fn find_process_id(&self, id: isize) -> bool {

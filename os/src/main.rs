@@ -25,22 +25,17 @@ mod process;
 mod syscall;
 mod dispatch;
 mod memory;
-mod loader;
 mod drivers;
 mod fs;
 
 extern crate alloc;
-
-use crate::loader::*;
 use crate::memory::*;
 use crate::process::*;
 use crate::dispatch::*;
 use alloc::sync::Arc;
-use crate::drivers::*;
 use crate::fs::*;
 
 global_asm!(include_str!("entry.asm"));
-global_asm!(include_str!("link_app.S"));
 
 #[no_mangle]
 pub extern "C" fn rust_main(_hart_id: usize, dtb_pa: PhysicalAddress) {
@@ -64,5 +59,5 @@ pub extern "C" fn rust_main(_hart_id: usize, dtb_pa: PhysicalAddress) {
 
     process::next_app(0);
     
-    panic!("end of rustmain")
+    //panic!("end of rustmain")
 }

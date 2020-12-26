@@ -2,7 +2,6 @@ use crate::memory::*;
 use crate::process::*;
 use core::mem::size_of;
 use spin::Mutex;
-use super::*;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
@@ -59,7 +58,7 @@ impl Process {
             }
         }
 
-        let mut context_ptr = 0;
+        let context_ptr;
 
         unsafe {
             let stack_top = &KERNEL_STACK[PROCESS_COUNTER as usize].stack as *const _ as usize + size_of::<KernelStack>();
@@ -100,21 +99,16 @@ impl Process {
         self.inner().child = Vec::new();
     }
 
-    pub fn get_context(&self) -> *mut Context {
-        unsafe {
-            self.inner().context_ptr as *mut Context
-        }
-    }
+    // pub fn get_context(&self) -> *mut Context {
+    //     unsafe {
+    //         self.inner().context_ptr as *mut Context
+    //     }
+    // }
 
     pub fn prepare(&self) -> usize {
         self.inner().memory_set.activate();
         self.inner().context_ptr
     }
-
-    pub fn set_state(&mut self, state: ProcessStatus) {
-        self.inner().state = state;
-    }
-
 
     /// 分配一定数量的连续虚拟空间
     ///
