@@ -31,6 +31,12 @@ impl MemorySet {
 
         // 建立字段
         let segments = vec![
+            // DEVICE 段，rw-
+            Segment {
+                map_type: MapType::Linear,
+                range: Range::from(DEVICE_START_ADDRESS..DEVICE_END_ADDRESS),
+                flags: Flags::READABLE | Flags::WRITABLE,
+            },
             // .text 段，r-x
             Segment {
                 map_type: MapType::Linear,
@@ -172,27 +178,12 @@ impl MemorySet {
                         vpn_range.push(vp);
                     }
                 }
-
-                //println!("vpn {}", vpn_range.len());
-
-                // for vpn in segment.range.iter() {
-                //     current_memory_set.activate();
-                //     let parent_ppn = Mapping::lookup(vpn).unwrap();
-                //     memory_set.activate();
-                //     let children_ppn = Mapping::lookup(vpn).unwrap();
-                //     *children_ppn.deref_kernel::<u8>() = *parent_ppn.deref_kernel::<u8>();
-                // }
-
-                
-                
+      
                 for vpn in vpn_range {
-                    //println!("{}", vpn);
                     current_memory_set.activate();
                     let parent_ppn = Mapping::lookup(vpn).unwrap();
                     memory_set.activate();
                     let children_ppn = Mapping::lookup(vpn).unwrap();
-                    //println!("parent_ppn {}, children_ppn {}", parent_ppn, children_ppn);
-                    //children_ppn.get_bytes_array().copy_from_slice(parent_ppn.get_bytes_array());
                     for i in 0..PAGE_SIZE {
                         *(children_ppn + i).deref_kernel::<u8>() = *(parent_ppn + i).deref_kernel::<u8>();
                     }

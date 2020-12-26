@@ -43,6 +43,6 @@ lazy_static! {
 
 /// 触发 [`static@ROOT_INODE`] 的初始化并打印根目录内容
 pub fn init() {
-    ROOT_INODE.ls();
-    println!("mod fs initialized");
+    //ROOT_INODE.ls();
+    println!("[K] mod fs initialized");
 }
