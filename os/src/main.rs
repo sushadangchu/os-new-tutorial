@@ -44,7 +44,7 @@ pub extern "C" fn rust_main(_hart_id: usize, dtb_pa: PhysicalAddress) {
     drivers::init(dtb_pa);
     fs::init();
 
-    let app = fs::ROOT_INODE.find("hello_world").unwrap();
+    let app = fs::ROOT_INODE.find("pipetest").unwrap();
     let data = app.readall().unwrap();
     let process1 = Arc::new(Process::new(data.as_slice()));
     //let process1 = Arc::new(Process::new(get_app_data_by_name("hello_world").unwrap()));

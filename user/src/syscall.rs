@@ -3,6 +3,8 @@
 pub const STDIN: usize = 0;
 pub const STDOUT: usize = 1;
 
+const SYSCALL_CLOSE: usize = 57;
+const SYSCALL_PIPE: usize = 59;
 const SYSCALL_READ: usize = 63;
 const SYSCALL_WRITE: usize = 64;
 pub const SYSCALL_EXIT: usize = 93;
@@ -38,12 +40,17 @@ pub fn sys_write(fd: usize, buffer: &[u8]) -> isize {
 }
 
 pub fn sys_read(fd: usize, buffer: &mut [u8]) -> isize {
-    syscall(
-        SYSCALL_READ,
-        fd,
-        buffer.as_mut_ptr() as usize,
-        buffer.len(),
-    )
+    loop {
+        let ret = syscall(
+            SYSCALL_READ,
+            fd,
+            buffer as *const [u8] as *const u8 as usize,
+            buffer.len(),
+        );
+        if ret > 0 {
+            return ret;
+        }
+    }
 }
 
 /// 退出并返回数值
@@ -79,4 +86,12 @@ pub fn sys_fork() -> isize {
 
 pub fn sys_wait_pid(pid: isize, _xstatus: *mut i32) -> isize {
     syscall(SYSCALL_WAIT_PID, pid as usize, 0, 0)
+}
+
+pub fn sys_pipe(fd: *mut usize) -> isize {
+    syscall(SYSCALL_PIPE, fd as usize, 0, 0)
+}
+
+pub fn sys_close(fd: usize) -> isize {
+    syscall(SYSCALL_CLOSE, fd, 0, 0)
 }

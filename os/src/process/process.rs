@@ -3,7 +3,8 @@ use crate::process::*;
 use core::mem::size_of;
 use spin::Mutex;
 use alloc::sync::Arc;
-use alloc::vec::Vec;
+use alloc::{vec, vec::Vec};
+use crate::fs::*;
 
 pub type ProcessID = isize;
 
@@ -21,6 +22,7 @@ pub struct ProcessInner {
     pub memory_set: MemorySet,
     pub state: ProcessStatus,
     pub child: Vec<isize>,
+    pub descriptors: Vec<Arc<dyn INode>>,
 }
 
 impl Process {
@@ -43,6 +45,7 @@ impl Process {
                 memory_set,
                 state: ProcessStatus::Ready,
                 child: Vec::new(),
+                descriptors: vec![STDIN.clone(), STDOUT.clone()],
             }),
         }
     }
@@ -82,6 +85,7 @@ impl Process {
                 memory_set,
                 state: ProcessStatus::Ready,
                 child: Vec::new(),
+                descriptors: self.inner().descriptors.clone(),
             }),
         })
     }

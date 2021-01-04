@@ -59,7 +59,7 @@ impl Scheduler {
                 let current_process = self.current_process.take().unwrap();
                 self.add_process(current_process);
             }
-
+            
             if self.current_process.is_none() == false {
                 self.current_process.take().unwrap();
             }

@@ -79,7 +79,9 @@ fn oom(_: Layout) -> ! {
     panic!("out of memory");
 }
 
-pub fn read(fd: usize, buf: &mut [u8]) -> isize { sys_read(fd, buf) }
+pub fn read(fd: usize, buf: &mut [u8]) -> isize { 
+    sys_read(fd, buf) 
+}
 pub fn write(fd: usize, buf: &[u8]) -> isize { sys_write(fd, buf) }
 pub fn exit(exit_code: i32) -> ! { sys_exit(exit_code); }
 pub fn yield_() -> isize { sys_yield() }
@@ -111,4 +113,12 @@ pub fn sleep(period_ms: usize) {
     while sys_get_time() < start + period_ms as isize {
         sys_yield();
     }
+}
+pub fn pipe() -> (usize, usize) {
+    let mut fd: [usize; 2] = [0; 2];
+    sys_pipe(&mut fd as *mut [usize] as *mut usize);
+    (fd[0], fd[1])
+}
+pub fn close(fd: usize) {
+    sys_close(fd);
 }
