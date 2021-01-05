@@ -122,3 +122,6 @@ pub fn pipe() -> (usize, usize) {
 pub fn close(fd: usize) {
     sys_close(fd);
 }
+pub fn open(path: &str, flags: usize) -> usize {
+    sys_open(path, flags) as usize
+}

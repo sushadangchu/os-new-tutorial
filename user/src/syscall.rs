@@ -3,6 +3,7 @@
 pub const STDIN: usize = 0;
 pub const STDOUT: usize = 1;
 
+const SYSCALL_OPEN: usize = 56;
 const SYSCALL_CLOSE: usize = 57;
 const SYSCALL_PIPE: usize = 59;
 const SYSCALL_READ: usize = 63;
@@ -53,7 +54,6 @@ pub fn sys_read(fd: usize, buffer: &mut [u8]) -> isize {
     }
 }
 
-/// 退出并返回数值
 pub fn sys_exit(code: i32) -> ! {
     syscall(SYSCALL_EXIT, code as usize, 0, 0);
     panic!("sys_exit never returns!");
@@ -94,4 +94,8 @@ pub fn sys_pipe(fd: *mut usize) -> isize {
 
 pub fn sys_close(fd: usize) -> isize {
     syscall(SYSCALL_CLOSE, fd, 0, 0)
+}
+
+pub fn sys_open(path: &str, flags: usize) -> isize {
+    syscall(SYSCALL_OPEN, path.as_bytes().as_ptr() as *const u8 as usize, flags, 0)
 }
